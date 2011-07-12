@@ -1,7 +1,7 @@
 Dependencies
 ============
 
-The program was built and tested on "Linux Mint 10 Julia".
+The program has been built and tested on "Linux Mint 10 Julia".
 
 compile depends:
 - header files from rabbitmq-erlang-client, 2.3.1+hg20110303.1-0ubuntu2
@@ -15,6 +15,7 @@ Compilation
 
 To build all the parts of the project type make from the project top
 level dir:
+
 	make
 
 Start
@@ -24,27 +25,30 @@ Start
 
 Sender part is located in 'client' dir. Set parameters in nums.conf that
 located in this dir to correct values.
-There must be correct paths for beam files in start command. These paths
+There must be correct paths for beam files in the start script. These paths
 are used with -pa keys and must contain all the modules necessary for sender.
 Run nums.sh script from 'client' dir to start sender module:
+
 	./nums.sh start
 
 2. Receiver
 
 Receiver part is located in 'server' dir. Set parameters in nums.conf that
 located in this dir to correct values.
-There must be correct paths for beam files in start command. These paths
+There must be correct paths for beam files in the start script. These paths
 are used with -pa keys and must contain all the modules necessary for receiver.
 Run nums.sh script from 'server' dir to start receiver module:
+
 	./nums.sh start
 
 
 Check
 =====
 
-Run sender and receiver and then go open the link http://localhost:8182/page1
+After starting sender and receiver check for appropriate log files.
+Default log files are located in client/log and server/log dirs.
+Next step to check is opening the link http://localhost:8182/page1
 in a browser. The page contains a form to complete. Fill in the form with
 any URL and send it.
-The sender should take input data and send it to the receiver. The receiver
+The sender should take filled data and send it to the receiver. The receiver
 issues HTTP HEAD command for received URL and logs the response it gets.
-Default log files are located in client/log and server/log dirs.
