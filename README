@@ -1,4 +1,3 @@
-depends:
+install:
 
-misultin
-amqp_client
+see doc/install
