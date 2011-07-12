@@ -8,10 +8,10 @@ start(){
 	-pa ../misc_rabbit/ebin \
 	-name "$node" \
 	-boot start_sasl \
+	-noshell -detached \
 	-s nums_ctl cmd \
 	-- start rc_server_app
 
-#	-noshell -detached \
 }
 
 stop(){
