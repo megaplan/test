@@ -5,6 +5,7 @@ start(){
 	-pa ebin \
 	-pa ../misc/ebin \
 	-pa ../misultin/ebin \
+	-pa ../mochiweb/ebin \
 	-pa ../misc_rabbit/ebin \
 	-name "$node" \
 	-boot start_sasl \
@@ -19,6 +20,7 @@ stop(){
 	-pa ebin \
 	-pa ../misc/ebin \
 	-pa ../misultin/ebin \
+	-pa ../mochiweb/ebin \
 	-pa ../misc_rabbit/ebin \
 	-name "$node_ctl" \
 	-boot start_sasl \
