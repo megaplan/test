@@ -20,7 +20,7 @@ task :default => [EBIN, :compile, :copy_app]
 
 task :copy_app do
   app_name = File.basename(Dir.pwd)
-  app_file = "src/#{app_name}.app"
+  app_file = "src/#{app_name}.app.src"
   if File.exist? app_file
     cp app_file, "#{EBIN}/#{app_name}.app"
   end

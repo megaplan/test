@@ -1,6 +1,6 @@
 cd File.dirname(__FILE__)
 
-APPS = ['client', 'misc', 'misc_rabbit', 'server']
+APPS = ['client', 'misc', 'misc_rabbit', 'nums_server']
 
 task :default => :build_apps
 

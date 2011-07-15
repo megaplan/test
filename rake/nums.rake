@@ -4,7 +4,7 @@ INCLUDE_DIRS = [
   '../misc_rabbit/include',
   '../client/include',
   '../misc/include',
-  '../server/include'
+  '../nums_server/include'
 ]
 
 load File.dirname(__FILE__) + '/erlang.rake'
