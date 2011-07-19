@@ -30,14 +30,14 @@ make_page1() ->
 	"<html>
 	<body>
 	<form method=\"post\" action=\"/page2\">
-	Message:
+	Method:
+	<INPUT type=\"text\" name=\""
+	?T2
+	"\"> <br/>
+	URL:
 	<input size=\"80\" type=\"text\" name=\""
 	?T1
-	%"\"/> <br/>
-	%Add:
-	%<INPUT type=\"text\" name=\""
-	%?T2
-	"\"> <br/>
+	"\"/> <br/>
 	<INPUT type=\"submit\" value=\"Send\"> <INPUT type=\"reset\"> <br/>
 	</form>
 	</body>
@@ -51,28 +51,23 @@ send_page2(C, Req) ->
 	Args = Req:parse_post(),
 	p_debug:p("~p:send_page2:~p args:~n~p~n",
 		[?MODULE, ?LINE, Args], C#nums.debug, http, 3),
-	V1 = proplists:get_value(?T1, Args, ""),
-	V2 = proplists:get_value(?T2, Args, ""),
-    proceed_cmd(C, V1, V2)
+	Url = proplists:get_value(?T1, Args, ""),
+	Method = proplists:get_value(?T2, Args, ""),
+    proceed_cmd(C, Url, Method)
 .
 %-------------------------------------------------------------------
-proceed_cmd(C, [$j, $s, $o, $n, $=, $~ | Data], V2) ->
+proceed_cmd(C, Url, Method) ->
 	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n",
-		[?MODULE, ?LINE, Data, V2], C#nums.debug, http, 3),
+		[?MODULE, ?LINE, Url, Method], C#nums.debug, http, 3),
     Struct = {struct, [
         {type, rest},
         {job_info, {struct, [
-            {method, head},
-            {url, list_to_binary(Data)}
+            {method, Method},
+            {url, list_to_binary(Url)}
             ]}}
         ]},
     V1 = mochijson2:encode(Struct),
-    proceed_send(C, V1, V2);
-proceed_cmd(C, V1, V2) ->
-	p_debug:p("~p:proceed_cmd:~p other~n~p~n~p~n",
-		[?MODULE, ?LINE, V1, V2], C#nums.debug, http, 3),
-    proceed_send(C, V1, V2)
-.
+    proceed_send(C, V1, "").
 %-------------------------------------------------------------------
 proceed_send(C, V1, V2) ->
 	sender:send_data(C, V1, V2),
