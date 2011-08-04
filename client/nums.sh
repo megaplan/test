@@ -1,7 +1,7 @@
 #!/bin/sh
 
 start(){
-	erl \
+	/usr/bin/erl \
 	-pa ebin \
 	-pa ../misc/ebin \
 	-pa ../misultin/ebin \

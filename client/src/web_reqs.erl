@@ -21,9 +21,46 @@ handle(C, 'POST', ["page2"], Req) ->
 	Res = send_page2(C, Req),
 	Req:ok([{"Content-Type", "text/plain"}], Res)
 ;
+handle(_C, 'GET', ["page3"], Req) ->
+	Txt = make_page3(),
+	Req:ok([{"Content-Type", "text/html"}], Txt)
+;
+handle(C, 'POST', ["page4"], Req) ->
+	send_page4(C, Req)
+;
 % 404
 handle(_, _, _, Req) ->
 	Req:ok([{"Content-Type", "text/plain"}], "Page not found.")
+.
+%-------------------------------------------------------------------
+send_page4(C, Req) ->
+	p_debug:p("~p:send_page4:~p req:~n~p~n",
+		[?MODULE, ?LINE, Req], C#nums.debug, http, 4),
+	Args = Req:parse_post(),
+	p_debug:p("~p:send_page4:~p args:~n~p~n",
+		[?MODULE, ?LINE, Args], C#nums.debug, http, 3),
+
+	BuildXml = fun({Param, Value}, Acc) ->
+		[lists:flatten(io_lib:format("<param><name>~s</name><value>~s</value></param>", [Param, Value]))|Acc]
+	end,
+	Xml = lists:flatten(lists:reverse(lists:foldl(BuildXml, [], Args))),
+	p_debug:p("~p:send_page4:~p xml:~n~p~n",
+		[?MODULE, ?LINE, Xml], C#nums.debug, http, 4),
+	Req:ok([{"Content-Type", "text/xml"}],
+        "<misultin_test>~s</misultin_test>",
+        [Xml])
+.
+%-------------------------------------------------------------------
+make_page3() ->
+    T = misc_time:get_time_str_us(),
+    "<html>
+<body>
+cur time: " ++
+T ++
+"
+</body>
+</html>
+"
 .
 %-------------------------------------------------------------------
 make_page1() ->

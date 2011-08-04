@@ -24,6 +24,9 @@
 	cur = #cur{},
 	port,
 	debug,
+    cert,
+    key,
+    pass,
 	mis
 }).
 

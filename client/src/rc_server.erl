@@ -30,7 +30,13 @@ init([Config]) ->
 	p_debug:p("~p:init:~p prepared~n", [?MODULE, ?LINE], C#nums.debug, run, 1),
 	{ok, Pid} = misultin:start_link(
 		[{port, C#nums.port},
-		{loop, fun(Req) -> web_reqs:handle_http(Rconf, Req) end}]),
+		{loop, fun(Req) -> web_reqs:handle_http(Rconf, Req) end},
+		{ssl, [
+			{certfile, C#nums.cert},
+			{keyfile, C#nums.key},
+			{password, C#nums.pass}
+		]}
+        ]),
 	State = Rconf#nums{mis = Pid},
 	%unlink(Pid), % only for manual start with console
 	p_debug:p("~p:init:~p done~n", [?MODULE, ?LINE], C#nums.debug, run, 1),

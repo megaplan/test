@@ -27,12 +27,22 @@ get_config(File) ->
 %-------------------------------------------------------------------
 fill_config(List) ->
 	R = nums_conf_rabbit:fill_rabbit_with(List),
-	#nums{
+    Ssl = fill_ssl_config(List),
+	Ssl#nums{
 		rabbit = R,
 		n = proplists:get_value(n, List, ?N_DEF),
 		log = proplists:get_value(log, List, ?LOG),
 		port = proplists:get_value(port, List, ?PORT),
 		debug = proplists:get_value(debug, List, [])
 	}
+.
+%-------------------------------------------------------------------
+fill_ssl_config(Big_list) ->
+    List = proplists:get_value(ssl, Big_list, []),
+    #nums{
+		cert = proplists:get_value(certfile, List, []),
+		key = proplists:get_value(keyfile, List, []),
+		pass = proplists:get_value(password, List, [])
+    }
 .
 %-------------------------------------------------------------------
