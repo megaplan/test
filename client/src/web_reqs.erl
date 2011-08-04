@@ -102,12 +102,13 @@ send_page2(C, Req) ->
 proceed_cmd(C, Url, Method, Params) ->
 	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n",
 		[?MODULE, ?LINE, Url, Method, Params], C#nums.debug, http, 3),
+    List = make_list_params(C, Params),
     Struct = {struct, [
         {type, rest},
         {rest_info, {struct, [
             {method, Method},
             {url, list_to_binary(Url)},
-            {params, Params}
+            {params, {struct, List}}
             ]}}
         ]},
     V1 = mochijson2:encode(Struct),
@@ -118,4 +119,11 @@ proceed_send(C, V1, V2) ->
 	p_debug:p("~p:send_page2:~p done~n",
 		[?MODULE, ?LINE], C#nums.debug, http, 5),
 	"ok\n".
+%-------------------------------------------------------------------
+make_list_params(C, Params) ->
+    Res = mochiweb_util:parse_qs(Params),
+	p_debug:p("~p:make_list_params:~p res:~n~p~n",
+		[?MODULE, ?LINE, Res], C#nums.debug, http, 4),
+    Res
+.
 %-------------------------------------------------------------------
