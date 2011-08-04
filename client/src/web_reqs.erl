@@ -6,6 +6,7 @@
 -include("nums.hrl").
 -define(T1, "fir1").
 -define(T2, "fir2").
+-define(T3, "fir3").
 %-------------------------------------------------------------------
 % @doc processes incoming http request
 handle_http(C, Req) ->
@@ -75,6 +76,10 @@ make_page1() ->
 	<input size=\"80\" type=\"text\" name=\""
 	?T1
 	"\"/> <br/>
+	Params:
+	<INPUT type=\"text\" name=\""
+	?T3
+	"\"> <br/>
 	<INPUT type=\"submit\" value=\"Send\"> <INPUT type=\"reset\"> <br/>
 	</form>
 	</body>
@@ -90,17 +95,19 @@ send_page2(C, Req) ->
 		[?MODULE, ?LINE, Args], C#nums.debug, http, 3),
 	Url = proplists:get_value(?T1, Args, ""),
 	Method = proplists:get_value(?T2, Args, ""),
-    proceed_cmd(C, Url, Method)
+	Params = proplists:get_value(?T3, Args, ""),
+    proceed_cmd(C, Url, Method, Params)
 .
 %-------------------------------------------------------------------
-proceed_cmd(C, Url, Method) ->
-	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n",
-		[?MODULE, ?LINE, Url, Method], C#nums.debug, http, 3),
+proceed_cmd(C, Url, Method, Params) ->
+	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n",
+		[?MODULE, ?LINE, Url, Method, Params], C#nums.debug, http, 3),
     Struct = {struct, [
         {type, rest},
-        {job_info, {struct, [
+        {rest_info, {struct, [
             {method, Method},
-            {url, list_to_binary(Url)}
+            {url, list_to_binary(Url)},
+            {params, Params}
             ]}}
         ]},
     V1 = mochijson2:encode(Struct),
