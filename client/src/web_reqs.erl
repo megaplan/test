@@ -7,6 +7,7 @@
 -define(T1, "fir1").
 -define(T2, "fir2").
 -define(T3, "fir3").
+-define(T4, "fir4").
 %-------------------------------------------------------------------
 % @doc processes incoming http request
 handle_http(C, Req) ->
@@ -80,6 +81,10 @@ make_page1() ->
 	<INPUT type=\"text\" name=\""
 	?T3
 	"\"> <br/>
+	Host:
+	<INPUT type=\"text\" name=\""
+	?T4
+	"\"> <br/>
 	<INPUT type=\"submit\" value=\"Send\"> <INPUT type=\"reset\"> <br/>
 	</form>
 	</body>
@@ -96,18 +101,20 @@ send_page2(C, Req) ->
 	Url = proplists:get_value(?T1, Args, ""),
 	Method = proplists:get_value(?T2, Args, ""),
 	Params = proplists:get_value(?T3, Args, ""),
-    proceed_cmd(C, Url, Method, Params)
+	Host = proplists:get_value(?T4, Args),
+    proceed_cmd(C, Url, Method, Params, Host)
 .
 %-------------------------------------------------------------------
-proceed_cmd(C, Url, Method, Params) ->
-	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n",
-		[?MODULE, ?LINE, Url, Method, Params], C#nums.debug, http, 3),
+proceed_cmd(C, Url, Method, Params, Host) ->
+	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n~p~n",
+		[?MODULE, ?LINE, Url, Method, Params, Host], C#nums.debug, http, 3),
     List = make_list_params(C, Params),
     Struct = {struct, [
         {type, rest},
         {rest_info, {struct, [
             {method, Method},
             {url, list_to_binary(Url)},
+            {host, Host},
             {params, {struct, List}}
             ]}}
         ]},
