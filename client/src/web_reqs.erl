@@ -8,6 +8,8 @@
 -define(T2, "fir2").
 -define(T3, "fir3").
 -define(T4, "fir4").
+-define(T5, "fir5").
+-define(T6, "fir6").
 %-------------------------------------------------------------------
 % @doc processes incoming http request
 handle_http(C, Req) ->
@@ -85,6 +87,14 @@ make_page1() ->
 	<INPUT type=\"text\" name=\""
 	?T4
 	"\"> <br/>
+	User:
+	<INPUT type=\"text\" name=\""
+	?T5
+	"\"> <br/>
+	Password:
+	<INPUT type=\"text\" name=\""
+	?T6
+	"\"> <br/>
 	<INPUT type=\"submit\" value=\"Send\"> <INPUT type=\"reset\"> <br/>
 	</form>
 	</body>
@@ -102,12 +112,15 @@ send_page2(C, Req) ->
 	Method = proplists:get_value(?T2, Args, ""),
 	Params = proplists:get_value(?T3, Args, ""),
 	Host = proplists:get_value(?T4, Args),
-    proceed_cmd(C, Url, Method, Params, Host)
+	User = proplists:get_value(?T5, Args),
+	Pass = proplists:get_value(?T6, Args),
+    proceed_cmd(C, Url, Method, Params, Host, User, Pass)
 .
 %-------------------------------------------------------------------
-proceed_cmd(C, Url, Method, Params, Host) ->
-	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n~p~n",
-		[?MODULE, ?LINE, Url, Method, Params, Host], C#nums.debug, http, 3),
+proceed_cmd(C, Url, Method, Params, Host, User, Pass) ->
+	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n~p~nauth: ~p, ~p~n",
+		[?MODULE, ?LINE, Url, Method, Params, Host, User, Pass],
+        C#nums.debug, http, 3),
     List = make_list_params(C, Params),
     Struct = {struct, [
         {type, rest},
@@ -115,6 +128,10 @@ proceed_cmd(C, Url, Method, Params, Host) ->
             {method, Method},
             {url, list_to_binary(Url)},
             {host, Host},
+            {auth_info, [
+                {user, User},
+                {password, Pass}
+            ]},
             {params, {struct, List}}
             ]}}
         ]},
@@ -122,8 +139,10 @@ proceed_cmd(C, Url, Method, Params, Host) ->
     proceed_send(C, V1, "").
 %-------------------------------------------------------------------
 proceed_send(C, V1, V2) ->
+	p_debug:p("~p:proceed_send:~p pars:~n~p~n~p~n",
+		[?MODULE, ?LINE, V1, V2], C#nums.debug, http, 5),
 	sender:send_data(C, V1, V2),
-	p_debug:p("~p:send_page2:~p done~n",
+	p_debug:p("~p:proceed_send:~p done~n",
 		[?MODULE, ?LINE], C#nums.debug, http, 5),
 	"ok\n".
 %-------------------------------------------------------------------
