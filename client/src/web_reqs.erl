@@ -10,6 +10,7 @@
 -define(T4, "fir4").
 -define(T5, "fir5").
 -define(T6, "fir6").
+-define(T7, "fir7").
 %-------------------------------------------------------------------
 % @doc processes incoming http request
 handle_http(C, Req) ->
@@ -95,6 +96,10 @@ make_page1() ->
 	<INPUT type=\"text\" name=\""
 	?T6
 	"\"> <br/>
+	Random list of data:
+	<INPUT type=\"checkbox\" name=\""
+	?T7
+	"\"> <br/>
 	<INPUT type=\"submit\" value=\"Send\"> <INPUT type=\"reset\"> <br/>
 	</form>
 	</body>
@@ -114,27 +119,29 @@ send_page2(C, Req) ->
 	Host = proplists:get_value(?T4, Args),
 	User = proplists:get_value(?T5, Args),
 	Pass = proplists:get_value(?T6, Args),
-    proceed_cmd(C, Url, Method, Params, Host, User, Pass)
+	Rand = proplists:get_value(?T7, Args),
+    proceed_cmd(C, Url, Method, Params, Host, User, Pass, Rand)
 .
 %-------------------------------------------------------------------
-proceed_cmd(C, Url, Method, Params, Host, User, Pass) ->
-	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n~p~nauth: ~p, ~p~n",
-		[?MODULE, ?LINE, Url, Method, Params, Host, User, Pass],
+proceed_cmd(C, Url, Method, Params, Host, User, Pass, Rand) ->
+	p_debug:p("~p:proceed_cmd:~p json~n~p~n~p~n~p~n~p~nauth: ~p, ~p~n"
+        "rand: ~p~n",
+		[?MODULE, ?LINE, Url, Method, Params, Host, User, Pass, Rand],
         C#nums.debug, http, 3),
     List = make_list_params(C, Params),
+    Auth = fill_auth(User, Pass, Rand),
     Struct = {struct, [
         {type, rest},
         {rest_info, {struct, [
             {method, Method},
             {url, list_to_binary(Url)},
             {host, Host},
-            {auth_info, [
-                {user, User},
-                {password, Pass}
-            ]},
+            Auth,
             {params, {struct, List}}
             ]}}
         ]},
+	p_debug:p("~p:proceed_cmd:~p struct:~n~p~n",
+		[?MODULE, ?LINE, Struct], C#nums.debug, http, 4),
     V1 = mochijson2:encode(Struct),
     proceed_send(C, V1, "").
 %-------------------------------------------------------------------
@@ -150,6 +157,32 @@ make_list_params(C, Params) ->
     Res = mochiweb_util:parse_qs(Params),
 	p_debug:p("~p:make_list_params:~p res:~n~p~n",
 		[?MODULE, ?LINE, Res], C#nums.debug, http, 4),
+    Res
+.
+%-------------------------------------------------------------------
+fill_auth(_User, _Pass, "on") ->
+    List = gen_rand_items(),
+    Type = {type, megaplan},
+    {auth_info, [Type | List]}
+;
+fill_auth(User, Pass, _) ->
+    {auth_info, [
+        {type, basic},
+        {user, User},
+        {password, Pass}
+    ]}
+.
+%-------------------------------------------------------------------
+gen_rand_items() ->
+	crypto:start(),
+	N = crypto:rand_uniform(1, 10),
+	F = fun(_, Acc) ->
+		Str = integer_to_list(Acc),
+		Key = "key" ++ Str,
+		Val = "val" ++ Str,
+		{{Key, Val}, Acc+1}
+	end,
+	{Res, _} = lists:mapfoldl(F, 0, lists:duplicate(N, true)),
     Res
 .
 %-------------------------------------------------------------------
