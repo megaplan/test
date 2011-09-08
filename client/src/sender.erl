@@ -39,13 +39,13 @@ start(Rses) ->
 	Xtype = Rses#rses.exchange_type,
 	
 	QueueDeclare = #'queue.declare'{ticket = Ticket, queue = Q,
-		passive = false, durable = false,
+		passive = false, durable = true,
 		exclusive = false, auto_delete = false,
 		nowait = false, arguments = []},
 	#'queue.declare_ok'{queue = Q} = amqp_channel:call(Channel, QueueDeclare),
 	ExchangeDeclare = #'exchange.declare'{ticket = Ticket,
 		exchange = X, type= Xtype,
-		passive = false, durable = false,
+		passive = false, durable = true,
 		auto_delete=false, internal = false,
 		nowait = false, arguments = []},
 	#'exchange.declare_ok'{} = amqp_channel:call(Channel, ExchangeDeclare),
@@ -54,7 +54,9 @@ start(Rses) ->
 %---------------------------------------------------------------------
 send_message(Channel, X, RoutingKey, Payload) ->
 	Publish = #'basic.publish'{exchange = X, routing_key = RoutingKey},
-	amqp_channel:call(Channel, Publish, #amqp_msg{payload = Payload})
+    Props = #'P_basic'{delivery_mode=2}, % persistent message
+	amqp_channel:call(Channel, Publish,
+        #amqp_msg{props = Props, payload = Payload})
 .
 %---------------------------------------------------------------------
 cancel_consumer(Channel, ConsumerTag) ->

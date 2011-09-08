@@ -132,7 +132,7 @@ proceed_cmd(C, Url, Method, Params, Host, User, Pass, Rand) ->
     Auth = fill_auth(User, Pass, Rand),
     Struct = {struct, [
         {type, rest},
-        {rest_info, {struct, [
+        {info, {struct, [
             {method, Method},
             {url, list_to_binary(Url)},
             {host, Host},
