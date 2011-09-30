@@ -163,7 +163,9 @@ make_list_params(C, Params) ->
 fill_auth(_User, _Pass, "on") ->
     List = gen_rand_items(),
     Type = {type, megaplan},
-    {auth_info, [Type | List]}
+    Akey = {authKey, gen_rand_key()},
+    Skey = {secretKey, gen_rand_key()},
+    {auth_info, [Type, Akey, Skey | List]}
 ;
 fill_auth(User, Pass, _) ->
     {auth_info, [
@@ -184,5 +186,9 @@ gen_rand_items() ->
 	end,
 	{Res, _} = lists:mapfoldl(F, 0, lists:duplicate(N, true)),
     Res
+.
+%-------------------------------------------------------------------
+gen_rand_key() ->
+    base64:encode_to_string(crypto:rand_bytes(16))
 .
 %-------------------------------------------------------------------
